@@ -1,66 +1,66 @@
 import time
 import gpiod
 
-# Настройка пина реле (GPIO23)
+# Relay pin configuration (GPIO23)
 RELAY_PIN = 23
 
-# Инициализируем переменные
+# Initialize variables
 chip = None
 line = None
 
 try:
-    # Получаем доступ к GPIO чипу
-    chip = gpiod.Chip('gpiochip4')  # На Raspberry Pi 5 обычно gpiochip4
-    print("Чип GPIO успешно открыт")
+    # Access the GPIO chip
+    chip = gpiod.Chip('gpiochip4')  # Usually gpiochip4 on Raspberry Pi 5
+    print("GPIO chip opened successfully")
     
-    # Запрашиваем линию GPIO для управления
+    # Request GPIO line for control
     line = chip.get_line(RELAY_PIN)
-    print(f"Линия GPIO {RELAY_PIN} получена")
+    print(f"GPIO line {RELAY_PIN} acquired")
     
-    # Настраиваем линию как выход
+    # Configure line as output
     line.request(consumer="relay_control", type=gpiod.LINE_REQ_DIR_OUT)
-    print("Линия настроена как выход")
+    print("Line configured as output")
     
-    # Включаем реле (устанавливаем высокий уровень)
-    line.set_value(1)
-    print("Устройство включено на 10 секунд")
+    # TURN ON relay (set LOW level - 0V)
+    line.set_value(0)
+    print("Device turned ON for 10 seconds")
     
-    # Ждем 10 секунд
+    # Wait for 10 seconds
     time.sleep(10)
     
-    # Выключаем реле (устанавливаем низкий уровень)
-    line.set_value(0)
-    print("Устройство выключено")
+    # TURN OFF relay (set HIGH level - 3.3V)
+    line.set_value(1)
+    print("Device turned OFF")
 
 except Exception as e:
-    print(f"Произошла ошибка: {str(e)}")
+    print(f"An error occurred: {str(e)}")
 
 finally:
-    # Всегда освобождаем ресурсы
-    print("Запуск процедуры очистки...")
+    # Always release resources
+    print("Starting cleanup procedure...")
     
-    # Гарантированно выключаем реле
+    # Ensure relay is turned OFF (set HIGH level)
     if line:
         try:
-            line.set_value(0)
-            print("Реле гарантированно выключено")
+            line.set_value(1)
+            print("Relay guaranteed to be OFF")
         except Exception as e:
-            print(f"Ошибка при выключении реле: {str(e)}")
+            print(f"Error turning off relay: {str(e)}")
     
-    # Освобождаем линию
+    # Release line
     if line:
         try:
             line.release()
-            print("Линия GPIO освобождена")
+            print("GPIO line released")
         except Exception as e:
-            print(f"Ошибка при освобождении линии: {str(e)}")
+            print(f"Error releasing line: {str(e)}")
     
-    # Закрываем чип
+    # Close chip
     if chip:
         try:
             chip.close()
-            print("Чип GPIO закрыт")
+            print("GPIO chip closed")
         except Exception as e:
-            print(f"Ошибка при закрытии чипа: {str(e)}")
+            print(f"Error closing chip: {str(e)}")
     
-    print("Процедура очистки завершена")
+    print("Cleanup procedure completed")
