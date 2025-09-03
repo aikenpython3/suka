@@ -3,17 +3,20 @@ import gpiod
 
 def test_all_pins():
     """Tests all GPIO pins on the Raspberry Pi 5"""
-    # Typically gpiochip4 on Raspberry Pi 5
+    # Correct chip name for Raspberry Pi 5
     chip_name = 'gpiochip4'
     
     try:
         # Get access to the GPIO chip
         chip = gpiod.Chip(chip_name)
         print(f"Using chip: {chip_name}")
-        print(f"Number of available pins: {chip.num_lines}")
+        
+        # Get the number of available pins (call the method)
+        num_pins = chip.num_lines()
+        print(f"Number of available pins: {num_pins}")
         
         # Test all available pins
-        for pin in range(chip.num_lines):
+        for pin in range(num_pins):
             try:
                 print(f"\nTesting pin {pin}...")
                 
